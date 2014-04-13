@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<form>
+		<input type="text" id="namebox" value=""/>
+		<input id="txtbox" type="text"></input>
+		<input type = "button" onClick="sendMessage();" value="send message"/>
+	</form>
+	<textarea rows="5" cols="100" id="msgbox"></textarea>
+	<script type="text/javascript">
+	   	var webskt = new WebSocket("ws://172.24.49.127:8080/WebSocketDemo1/serverEndpointDemo");
+	   	var name = document.getElementById("namebox");
+	   	var msg = document.getElementById("msgbox");
+	   	var txt = document.getElementById("txtbox");
+	   	function sendMessage() {
+	   		if(txt.value!="close"){
+		   		webskt.send(document.getElementById("namebox").value+""+txt.value);
+		   	//	msg.value += "\n messge send to server "+txt.value;
+	   			txt.value ="";
+	   		}
+	   		else {
+	   			webskt.close();
+	   		}
+	   		
+	   	}
+	   	webskt.onmessage = function(message) {
+	   		processMessage(message);
+	   	}
+	   	webskt.onopen = function(message) {
+	   		//webskt.send("uname " +name.value);
+	   		processOpen(message);
+	   	}
+	   	webskt.onclose = function(message) {
+	   		processClose(message);
+	   	}
+	   	webskt.onerror = function(message){
+	   		msg.value += " \n Error occured";	
+	   	}
+	   	
+	   	function processMessage(message) {
+	   		msg.value +=" \n Message Received from server -->"+message.data;
+	   	}
+	   	function processOpen(message) {
+	   		msg.value += "\n server connecting.. to "+message;
+	   		
+	   	}
+	   	function processClose(message) {
+	   		webskt.send("client disconnecting.....");
+	   		msg.value += "client disconnected";
+	   	}
+	   	function processError(message) {
+	   		msg.value += " Error occured "+message;
+	   	}
+	</script>
+</body>
+</html>
